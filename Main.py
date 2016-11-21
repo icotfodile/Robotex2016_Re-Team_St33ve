@@ -11,7 +11,7 @@ import Detect as Detect
 import Dribble as Drib
 import Motor_controller as Motor
 import Coilgun as C
-import File
+#import File
 
 
 '''
@@ -83,11 +83,30 @@ if __name__ == '__main__':
     TEST = 11
 
     #GLOBAL VARIABLES
-    h_low_B, s_low_B, v_low_B, h_high_B, s_high_B, v_high_B = File.readfile('ball_values.txt')
+    '''h_low_B, s_low_B, v_low_B, h_high_B, s_high_B, v_high_B = File.readfile('ball_values.txt')
     h_low_Gb, s_low_Gb, v_low_Gb, h_high_Gb, s_high_Gb, v_high_Gb = File.readfile('goal_values_blue.txt')
-    h_low_Gy, s_low_Gy, v_low_Gy, h_high_Gy, s_high_Gy, v_high_Gy = File.readfile('goal_values_yellow.txt')
-    _enemy_goal = 'b'  # 'b' - blue; 'y' - yellow
-    _driveto_goal = 'b'
+    h_low_Gy, s_low_Gy, v_low_Gy, h_high_Gy, s_high_Gy, v_high_Gy = File.readfile('goal_values_yellow.txt')'''
+    h_low_B = 5
+    s_low_B =158
+    v_low_B = 132
+    h_high_B = 12
+    s_high_B = 200
+    v_high_B = 253
+    h_low_Gb = 86
+    s_low_Gb = 63
+    v_low_Gb = 44,
+    h_high_Gb = 126
+    s_high_Gb = 131
+    v_high_Gb = 131
+    h_low_Gy = 10
+    s_low_Gy = 80
+    v_low_Gy = 178
+    h_high_Gy = 51
+    s_high_Gy = 116
+    v_high_Gy = 213
+
+    _enemy_goal = 'y'  # 'b' - blue; 'y' - yellow
+    _driveto_goal = 'y'
     _camera_buffer = 2
     Robotiv2ljak = 'B'
     Robotit2his = 'A'
