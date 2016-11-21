@@ -1,0 +1,36 @@
+include ref after init in main.py
+    def check_ref(self):
+        outr = ''
+        while connection_ref.inWaiting() > 0:
+            outr += connection_ref.read(1)
+
+        if (outr != '') & (len(outr) >= 12):
+            if (outr[0] == 'a') & (outr[1] == Robotiv2ljak):
+                if outr[2] == 'X':
+                    if outr[3:7] == 'STOP':
+                        Main.__exit__(self)
+                elif outr[2] == Robotit2his:
+                    if outr[3:7] == 'STOP':
+                        Main.__exit__(self)
+
+
+
+
+include in if _name_
+ connection_ref= serial.Serial(
+        port='COM4',  # make global
+        baudrate=9600,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS
+    )
+    connection_ref.isOpen()
+
+USE test to check
+
+        elif STATE == TEST:
+            print('TEST')
+            # main.motors.turn('left')
+            # Goalx = main.vision.find_goal()
+            # main.motors.center_goal(Goalx)
+            # main.motors.turn('left')
+            # main.motors.center_goal(Goalx)

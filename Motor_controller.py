@@ -4,6 +4,9 @@ __author__ = 'Ikechukwu Ofodile -- ikechukwu.ofodile@estcube.eu'
 from time import sleep
 import numpy as np
 
+#3 is left, 2 is right, 1 is back
+#for cpp 2 is back, 1 is right, 3 is left
+
 class Motors_controller:
 
     def __init__(self, port):
