@@ -41,7 +41,7 @@ class Main:
 if __name__ == '__main__':
 
 
-    port = serial.Serial('/dev/ttyACM1', baudrate=9600, timeout=None)  # make global
+    port = serial.Serial('COM9', baudrate=9600, timeout=0)  # make global
     print("connected to: " + port.portstr)
 
     END = 0
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     v_high_B = 253
     h_low_Gb = 86
     s_low_Gb = 63
-    v_low_Gb = 44,
+    v_low_Gb = 4
     h_high_Gb = 126
     s_high_Gb = 131
     v_high_Gb = 131
@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
 
 
-        main.detect.show_frame()
+        #main.detect.show_frame()
 
         k = cv2.waitKey(1) & 0xFF
 
