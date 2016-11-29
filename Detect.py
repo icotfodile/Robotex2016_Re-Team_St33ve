@@ -1,83 +1,80 @@
-__author__ = 'Ikechukwu Ofodile -- ikechukwu.ofodile@estcube.eu'
 
-from time import sleep
 import cv2
 import numpy as np
+import ConfigParser
+import imutils
 
 
-class Detect:
+class Detector:
+    ballmin1 = 0
+    ballmin2 = 0
+    ballmin3 = 0
+    ballmax1 = 0
+    ballmax2 = 0
+    ballmax3 = 0
 
-    def __init__(self, h_low_B, s_low_B, v_low_B, h_high_B, s_high_B, v_high_B, h_low_Gb, s_low_Gb, v_low_Gb, h_high_Gb, s_high_Gb, v_high_Gb,
-                        h_low_Gy, s_low_Gy, v_low_Gy, h_high_Gy, s_high_Gy, v_high_Gy):
-        self.cap = cv2.VideoCapture(1)
-        sleep(0.3)
-        self.frame = self.cap.read()
-        sleep(0.3)
-        self.frame = self.cap.read()
-        sleep(0.1)
-        self.hsv = self.frame
-        self.lowerballs = np.array([h_low_B, s_low_B, v_low_B])
-        self.upperballs = np.array([h_high_B, s_high_B, v_high_B])
-        self.lowergoalblue = np.array([h_low_Gb, s_low_Gb, v_low_Gb])
-        self.uppergoalblue = np.array([h_high_Gb, s_high_Gb, v_high_Gb])
-        self.lowergoalyellow = np.array([h_low_Gy, s_low_Gy, v_low_Gy])
-        self.uppergoalyellow = np.array([h_high_Gy, s_high_Gy, v_high_Gy])
-        print "camera initialized"
+    goalmin1 = 0
+    goalmin2 = 0
+    goalmin3 = 0
+    goalmax1 = 0
+    goalmax2 = 0
+    goalmax3 = 0
 
-    def read_frame(self, buffer):
-        for i in range(buffer):
-            _, self.frame = self.cap.read()
-        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
-        self.hsv = cv2.GaussianBlur(self.hsv, (25, 25), 0)
 
-    def show_frame(self):
-        # frame 640x480
-        cv2.imshow('frame', self.frame)
 
-    def detectball(self):
-        # Ballradius = 0
-        mask = cv2.inRange(self.hsv, self.lowerballs, self.upperballs)
-        erodeBalls = cv2.erode(mask, None, iterations=2)
-        contours = cv2.findContours(erodeBalls.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-        B_x = 0
-        B_y = 0
+    def __init__(self):
+        config = ConfigParser.RawConfigParser()
 
-        if len(contours) > 0:
-            contoursMax = max(contours, key=cv2.contourArea)
-            ((B_x, B_y), B_r) = cv2.minEnclosingCircle(contoursMax)
-            # circle: image, center, radius, color, thickness
-            # cv2.circle(self.frame, (int(Ballx), int(Bally)), int(Ballradius), (0, 255, 0), 2)
-            cv2.circle(self.frame, (int(B_x), int(B_y)), 2, (0, 0, 255), 5)
-        if B_x is None or B_y is None:
-            return 0, 0
+        config.read('example.cfg')
+        self.ballmin1 = config.getint('Ball', 'min1')
+        self.ballmin2 = config.getint('Ball', 'min2')
+        self.ballmin3 = config.getint('Ball', 'min3')
+        self.ballmax1 = config.getint('Ball', 'max1')
+        self.ballmax2 = config.getint('Ball', 'max2')
+        self.ballmax3 = config.getint('Ball', 'max3')
+
+        config.read('example.cfg')
+        self.goalmin1 = config.getint('Goal', 'min1')
+        self.goalmin2 = config.getint('Goal', 'min2')
+        self.goalmin3 = config.getint('Goal', 'min3')
+        self.goalmax1 = config.getint('Goal', 'max1')
+        self.goalmax2 = config.getint('Goal', 'max2')
+        self.goalmax3 = config.getint('Goal', 'max3')
+
+
+
+
+
+
+    def ball_coordinates(self, frame):
+        balldetails = [0, 0, 0]
+
+        # Convert BGR to HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.GaussianBlur(hsv, (11, 11), 0)
+
+        # define range of orange color in HSV
+        lower_ball = np.array([self.ballmin1, self.ballmin2, self.ballmin3])
+        upper_ball = np.array([self.ballmax1, self.ballmax2, self.ballmax3])
+
+        ballmask = cv2.inRange(hsv, lower_ball, upper_ball)
+        ballmask = cv2.erode(ballmask, None, iterations=2)
+        ballmask = cv2.dilate(ballmask, None, iterations=2)
+
+        ballcontours = cv2.findContours(ballmask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+
+        if len(ballcontours) > 0:
+
+            ballcontour = max(ballcontours, key=cv2.contourArea)
+            ((x, y), radius) = cv2.minEnclosingCircle(ballcontour)
+
+            if radius > 5:
+                # draw the circle and centroid on the frame,
+                # then update the list of tracked points
+                cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
+                cv2.circle(frame, (int(x), int(y)), 5, (0, 0, 255), -1)
+                balldetails = [x, y, radius]
         else:
-            return B_x, B_y
-
-
-    def detectgoal(self, goal):
-        if goal == 'b':
-            mask = cv2.inRange(self.hsv, self.lowergoalblue, self.uppergoalblue)
-        else:
-            mask = cv2.inRange(self.hsv, self.lowergoalyellow, self.uppergoalyellow)
-        erodeGoal = cv2.erode(mask, None, iterations=2)
-        contours = cv2.findContours(erodeGoal.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) [-2]
-
-        cx = 0
-        if len(contours) > 0:
-            contoursMax = max(contours, key=cv2.contourArea)
-            area = cv2.contourArea(contoursMax)
-            if area > 500:
-                cv2.drawContours(self.frame, contoursMax, -1, (255, 105, 180), 3)
-                M = cv2.moments(contoursMax)
-                if M["m00"] != 0:
-                    cx = int(M['m10'] / M['m00'])
-                    cy = int(M['m01'] / M['m00'])
-                    cv2.circle(self.frame, (int(cx), int(cy)), 2, (0, 0, 233), 5)
-            return cx, area
-        else:
-            return 0, 0
-
-    def shut_down(self):
-        self.cap.release()
-        cv2.destroyAllWindows()
-        print("detect shut down")
+            balldetails = [0, 0, 0]
+        cv2.imshow('ballframe', frame)
+        return balldetails
